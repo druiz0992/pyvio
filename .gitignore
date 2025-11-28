@@ -1,0 +1,62 @@
+# ---- Python bytecode ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+ENV/
+*.env
+*.venv
+
+# ---- Build / distribution ----
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+*.ipynb~ 
+
+# ---- pytest / coverage ----
+.cache/
+pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ---- MyPy / Pyright / type checkers ----
+.mypy_cache/
+.pyright/
+pyrightconfig.json
+
+# ---- Logs ----
+*.log
+
+# ---- IDE / Editor ----
+# VS Code
+.vscode/
+
+# PyCharm / IntelliJ
+.idea/
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+
+# ---- Environment files ----
+*.env
+.env.*
+
+# ---- Tools ----
+# tox
+.tox/
+.tox*
+
+
+*.sw*
