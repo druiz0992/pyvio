@@ -22,3 +22,13 @@ class TimestampUnwrapper:
 
         self.prev_raw[sensor] = raw_ts
         return raw_ts + self.offset[sensor]
+    
+    def prev_sample(self, sensor: SensorType) -> int:
+        if sensor not in self.prev_raw:
+            return 0 
+
+        if self.offset[sensor] and self.prev_raw[sensor]:
+            return self.offset[sensor] + self.prev_raw[sensor]
+
+        return self.prev_raw[sensor]
+    

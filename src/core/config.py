@@ -3,6 +3,7 @@ import yaml
 from pathlib import Path
 from typing import Any, Dict, Optional
 from core.domain.samples import SensorType, SampleEncoding
+from utils.gpio import GPIO
 
 
 DEFAULT_SENSITIVITY = 1
@@ -12,6 +13,7 @@ DEFAULT_BAUD_RATE = 115200
 DEFAULT_PORT_NAME = "/dev/ttyACM1"
 DEFAULT_ENCODING = SampleEncoding.BINARY
 DEFAULT_SAMPLE_ANIMATION = False
+DEFAULT_SYNC_GPIO = GPIO.NONE
 
 
 class Config:
@@ -84,3 +86,13 @@ class Config:
     def serial_port_rate(self) -> int:
         serial_props = self._data.get("serial", {})
         return serial_props.get("baud_rate", DEFAULT_BAUD_RATE)
+
+    @property
+    def imu_gpio(self) -> int:
+        sync_props = self._data.get("sync", {})
+        return sync_props.get("imu", DEFAULT_SYNC_GPIO)
+    
+    @property
+    def gps_gpio(self) -> int:
+        sync_props = self._data.get("sync", {})
+        return sync_props.get("gps", DEFAULT_SYNC_GPIO)

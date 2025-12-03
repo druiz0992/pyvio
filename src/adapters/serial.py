@@ -26,12 +26,8 @@ class SerialSensorAdapter(SensorPort):
         self.encoding = cfg.sample_encoding
         self.sensor_sensitivity = cfg.sensor_sensitivity()
         self.sample_width = cfg.sensor_sample_width()
-        self.clock_freq_hz = cfg.clock_freq_hz
         self._running_ = True
-        self.clock = Clock()
-
-        self._ticks_ns = 1_000_000_000 // self.clock_freq_hz
-        self._ticks_rem = 1_000_000_000 % self.clock_freq_hz
+        self.clock = Clock(cfg.clock_freq_hz)
 
         self.stage = Stage[SensorSample](
             sensors=sensors,
@@ -77,9 +73,6 @@ class SerialSensorAdapter(SensorPort):
                     sample = RawSensorSample.from_str(
                         line,
                         self.clock,
-                        self._ticks_ns,
-                        self._ticks_rem,
-                        self.clock_freq_hz,
                     )
                 except ValueError:
                     continue
@@ -104,9 +97,6 @@ class SerialSensorAdapter(SensorPort):
                     sensor_type,
                     data,
                     self.clock,
-                    self._ticks_ns,
-                    self._ticks_rem,
-                    self.clock_freq_hz,
                 )
 
                 self.put(sample)

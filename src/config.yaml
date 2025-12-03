@@ -13,6 +13,10 @@ clock_freq_hz: 48000000
 sample_encoding: BINARY
 sample_animation: true
 
+sync:
+  imu: NONE
+  gps: NONE
+
 serial:
   baud_rate: 115200
   port_name: /dev/imu
