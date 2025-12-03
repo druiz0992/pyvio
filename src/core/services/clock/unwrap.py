@@ -1,5 +1,5 @@
 from typing import Dict
-from .samples import SensorType
+from core.domain.samples import SensorType
 
 
 class TimestampUnwrapper:

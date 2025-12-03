@@ -2,4 +2,6 @@ matplotlib==3.10.7
 numpy==2.3.5
 PyYAML==6.0.3
 pyserial==3.5
-
+pyaml==25.7.0
+AHRS==0.4.0
+gpiod==2.4.0

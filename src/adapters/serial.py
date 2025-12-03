@@ -9,7 +9,7 @@ from core.domain.samples import (
     SampleEncoding,
 )
 from core.config import Config
-from core.domain.timestamp import TimestampUnwrapper
+from core.services.clock.clock import Clock
 from core.domain.pipeline.stage import Stage
 from utils.stats_deque import TIMESTAMP_DIFF
 
@@ -28,7 +28,7 @@ class SerialSensorAdapter(SensorPort):
         self.sample_width = cfg.sensor_sample_width()
         self.clock_freq_hz = cfg.clock_freq_hz
         self._running_ = True
-        self.unwrapper = TimestampUnwrapper()
+        self.clock = Clock()
 
         self._ticks_ns = 1_000_000_000 // self.clock_freq_hz
         self._ticks_rem = 1_000_000_000 % self.clock_freq_hz
@@ -76,7 +76,7 @@ class SerialSensorAdapter(SensorPort):
                 try:
                     sample = RawSensorSample.from_str(
                         line,
-                        self.unwrapper,
+                        self.clock,
                         self._ticks_ns,
                         self._ticks_rem,
                         self.clock_freq_hz,
@@ -103,7 +103,7 @@ class SerialSensorAdapter(SensorPort):
                 sample = RawSensorSample.from_bytes(
                     sensor_type,
                     data,
-                    self.unwrapper,
+                    self.clock,
                     self._ticks_ns,
                     self._ticks_rem,
                     self.clock_freq_hz,
