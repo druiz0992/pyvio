@@ -3,7 +3,7 @@ import yaml
 from pathlib import Path
 from typing import Any, Dict, Optional
 from core.domain.samples import SensorType, SampleEncoding
-from utils.gpio import GPIO
+from core.domain.sync_params import GPIO, SyncParams, parse_gpio
 
 
 DEFAULT_SENSITIVITY = 1
@@ -13,7 +13,8 @@ DEFAULT_BAUD_RATE = 115200
 DEFAULT_PORT_NAME = "/dev/ttyACM1"
 DEFAULT_ENCODING = SampleEncoding.BINARY
 DEFAULT_SAMPLE_ANIMATION = False
-DEFAULT_SYNC_GPIO = GPIO.NONE
+DEFAULT_SYNC_GPIO: GPIO = GPIO.NONE
+DEFAULT_SYNC_FREQ_HZ = 100
 
 
 class Config:
@@ -87,12 +88,26 @@ class Config:
         serial_props = self._data.get("serial", {})
         return serial_props.get("baud_rate", DEFAULT_BAUD_RATE)
 
-    @property
-    def imu_gpio(self) -> int:
+    def imu_sync(self) -> SyncParams:
         sync_props = self._data.get("sync", {})
-        return sync_props.get("imu", DEFAULT_SYNC_GPIO)
-    
-    @property
-    def gps_gpio(self) -> int:
+        imu_props = sync_props.get("imu", {})
+
+        if not imu_props:
+            return SyncParams(DEFAULT_SYNC_GPIO, DEFAULT_SYNC_FREQ_HZ)
+
+        return SyncParams(
+            gpio=parse_gpio(imu_props.get("gpio", DEFAULT_SYNC_GPIO.value)),
+            frequency_hz=imu_props.get("frequency", DEFAULT_SYNC_FREQ_HZ),
+        )
+
+    def gps_sync(self) -> SyncParams:
         sync_props = self._data.get("sync", {})
-        return sync_props.get("gps", DEFAULT_SYNC_GPIO)
+        gps_props = sync_props.get("gps", {})
+
+        if not gps_props:
+            return SyncParams(DEFAULT_SYNC_GPIO, DEFAULT_SYNC_FREQ_HZ)
+
+        return SyncParams(
+            gpio=parse_gpio(gps_props.get("gpio", DEFAULT_SYNC_GPIO.value)),
+            frequency_hz=gps_props.get("frequency", DEFAULT_SYNC_FREQ_HZ),
+        )

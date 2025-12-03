@@ -27,7 +27,7 @@ class SerialSensorAdapter(SensorPort):
         self.sensor_sensitivity = cfg.sensor_sensitivity()
         self.sample_width = cfg.sensor_sample_width()
         self._running_ = True
-        self.clock = Clock(cfg.clock_freq_hz)
+        self.clock = Clock(cfg.clock_freq_hz, cfg.imu_sync())
 
         self.stage = Stage[SensorSample](
             sensors=sensors,
@@ -45,8 +45,9 @@ class SerialSensorAdapter(SensorPort):
 
     def put(self, sample: RawSensorSample):
         """Append sample to the corresponding sensor queue."""
-        processed_sample = self._apply_sensitivity(sample)
-        self.stage.put(sample.sensor, processed_sample)
+        if sample.sensor != SensorType.TIMER:
+            processed_sample = self._apply_sensitivity(sample)
+            self.stage.put(sample.sensor, processed_sample)
 
     def get(self, sensor: SensorType) -> SensorSample | None:
         """Get oldest sample from specific sensor queue."""

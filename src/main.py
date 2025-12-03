@@ -23,12 +23,9 @@ def main():
     ahrs = Ahrs(sensor_adapter.stage, maxlen=100)
 
     sensor_adapter.start()
-    #ahrs.start_animation(interval=50)
+    ahrs.start_animation(interval=50, display=False)
 
     # visualizer.start_animation(interval=50)
-    
-    while True:
-        pass
 
 
 if __name__ == "__main__":

@@ -1,11 +1,12 @@
 from adapters.pps_gpio import PulsePerSecondGPIO
-from utils.gpio import GPIO
+from core.domain.sync_params import GPIO
 from typing import Callable
 import threading
 
-class PPSMonitor():
-    def __init__(self):
-        self.pps = PulsePerSecondGPIO(GPIO.NONE)
+
+class PPSMonitor:
+    def __init__(self, gpio: GPIO):
+        self.pps = PulsePerSecondGPIO(gpio)
         self._stop_event = threading.Event()
         self._thread = None
 

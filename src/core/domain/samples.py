@@ -8,6 +8,7 @@ class SensorType(Enum):
     ACCELEROMETER = "A"
     GYROSCOPE = "G"
     MAGNETOMETER = "M"
+    TIMER = "T"
 
     @classmethod
     def from_binary(cls, code: int) -> SensorType | None:
@@ -15,6 +16,7 @@ class SensorType(Enum):
             0: cls.MAGNETOMETER,
             1: cls.ACCELEROMETER,
             2: cls.GYROSCOPE,
+            3: cls.TIMER,
         }
         return mapping.get(code)
 
