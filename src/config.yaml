@@ -18,10 +18,8 @@ sample_animation: true
 sync:
   imu:
     gpio: NONE
-    freq_hz: 100
   gps: 
     gpio: NONE
-    freq_hz: 100
 
 serial:
   baud_rate: 115200

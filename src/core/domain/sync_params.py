@@ -40,11 +40,9 @@ def parse_gpio(value) -> GPIO:
 @dataclass
 class SyncParams:
     gpio: GPIO
-    frequency_hz: int
 
     @staticmethod
     def from_dict(imu_props: dict) -> "SyncParams":
         gpio_raw = imu_props.get("gpio", DEFAULT_SYNC_GPIO.value)
         gpio = parse_gpio(gpio_raw)
-        freq = imu_props.get("frequency_hz", 0)
-        return SyncParams(gpio, freq)
+        return SyncParams(gpio)

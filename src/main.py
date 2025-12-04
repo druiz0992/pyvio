@@ -1,4 +1,5 @@
 import logging
+import time
 
 from adapters.serial import SerialSensorAdapter
 from core.ports.sensor import SensorPort
@@ -20,12 +21,14 @@ def main():
     sensor_adapter: SensorPort = SerialSensorAdapter(sensors, cfg)
 
     # visualizer = LiveVisualizer(sensor_adapter.stage, maxlen=1000)
-    ahrs = Ahrs(sensor_adapter.stage, maxlen=100)
+    #ahrs = Ahrs(sensor_adapter.stage, maxlen=100)
 
     sensor_adapter.start()
-    ahrs.start_animation(interval=50, display=False)
+    #ahrs.start_animation(interval=50)
 
     # visualizer.start_animation(interval=50)
+    while True:
+        time.sleep(0.1)
 
 
 if __name__ == "__main__":

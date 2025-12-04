@@ -82,7 +82,7 @@ class RawSensorSample:
             raise ValueError(f"Unknown sensor type: {sensor_char}")
 
         # Convert numeric fields
-        timestamp = clock.get_timstamp(sensor_type, int(ts_str))
+        timestamp = clock.get_timestamp(sensor_type, int(ts_str))
         x = int(x_str)
         y = int(y_str)
         z = int(z_str)

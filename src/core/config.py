@@ -14,7 +14,6 @@ DEFAULT_PORT_NAME = "/dev/ttyACM1"
 DEFAULT_ENCODING = SampleEncoding.BINARY
 DEFAULT_SAMPLE_ANIMATION = False
 DEFAULT_SYNC_GPIO: GPIO = GPIO.NONE
-DEFAULT_SYNC_FREQ_HZ = 100
 
 
 class Config:
@@ -93,11 +92,10 @@ class Config:
         imu_props = sync_props.get("imu", {})
 
         if not imu_props:
-            return SyncParams(DEFAULT_SYNC_GPIO, DEFAULT_SYNC_FREQ_HZ)
+            return SyncParams(DEFAULT_SYNC_GPIO)
 
         return SyncParams(
             gpio=parse_gpio(imu_props.get("gpio", DEFAULT_SYNC_GPIO.value)),
-            frequency_hz=imu_props.get("frequency", DEFAULT_SYNC_FREQ_HZ),
         )
 
     def gps_sync(self) -> SyncParams:
@@ -105,9 +103,8 @@ class Config:
         gps_props = sync_props.get("gps", {})
 
         if not gps_props:
-            return SyncParams(DEFAULT_SYNC_GPIO, DEFAULT_SYNC_FREQ_HZ)
+            return SyncParams(DEFAULT_SYNC_GPIO)
 
         return SyncParams(
             gpio=parse_gpio(gps_props.get("gpio", DEFAULT_SYNC_GPIO.value)),
-            frequency_hz=gps_props.get("frequency", DEFAULT_SYNC_FREQ_HZ),
         )

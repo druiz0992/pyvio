@@ -24,7 +24,7 @@ class PulsePerSecondGPIO(PulsePerSecondPort):
         if self.line_offset == GPIO.NONE:
             while True:
                 time.sleep(0.01)
-                timestamp = time.monotonic_ns() / 1e9
+                timestamp = time.time_ns()
                 for handler in self.handlers:
                     handler(timestamp)
 
@@ -45,6 +45,6 @@ class PulsePerSecondGPIO(PulsePerSecondPort):
                         events = request.read_edge_events()
                         for ev in events:
                             if ev.event_type == gpiod.EdgeEvent.Type.FALLING_EDGE:
-                                timestamp = ev.timestamp_ns / 1e9
+                                timestamp = ev.timestamp_ns
                                 for handler in self.handlers:
                                     handler(timestamp)

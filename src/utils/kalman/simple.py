@@ -60,8 +60,9 @@ class KalmanFilter:
         # Innovation covariance
         S = H @ self.P @ H.T + R
 
-        # Kalman gain
-        K = self.P @ H.T @ np.linalg.inv(S)
+        # Kalman Gain: K = P H^T S^{-1}
+        # Efficient solve: solve S K^T = (H P)^T
+        K = np.linalg.solve(S, (H @ self.P).T).T
 
         # Update
         self.x = self.x + K @ y

@@ -44,10 +44,13 @@ class SerialSensorAdapter(SensorPort):
         t.start()
 
     def put(self, sample: RawSensorSample):
+        import time
         """Append sample to the corresponding sensor queue."""
         if sample.sensor != SensorType.TIMER:
             processed_sample = self._apply_sensitivity(sample)
             self.stage.put(sample.sensor, processed_sample)
+        else:
+            self.clock.update_mcu_timestamp(sample)
 
     def get(self, sensor: SensorType) -> SensorSample | None:
         """Get oldest sample from specific sensor queue."""

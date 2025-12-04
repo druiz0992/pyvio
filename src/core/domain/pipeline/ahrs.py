@@ -103,12 +103,8 @@ class Ahrs:
 
         return [poly3d]
 
-    def start_animation(self, interval=50, display=True):
-        if display:
-            self.ani = FuncAnimation(
-                self.fig, self.update_filter, frames=100, interval=interval, blit=False
-            )
-            plt.show(block=True)
-        else:
-            while True:
-                self.update_filter()
+    def start_animation(self, interval=50):
+        self.ani = FuncAnimation(
+            self.fig, self.update_filter, frames=100, interval=interval, blit=False
+        )
+        plt.show(block=True)
