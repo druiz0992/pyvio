@@ -1,9 +1,10 @@
 import gpiod
 from gpiod.line import Direction, Edge, Clock
-from core.ports.pps import PulsePerSecondPort
-from core.domain.sync_params import GPIO
 from typing import Callable
 import time
+
+from core.ports.pps import PulsePerSecondPort
+from core.domain.sync_params import GPIO
 
 
 class PulsePerSecondGPIO(PulsePerSecondPort):

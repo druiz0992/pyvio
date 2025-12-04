@@ -1,8 +1,8 @@
 import threading
 import requests
 import time
-
 from typing import List, Callable, Tuple
+
 from core.ports.sensor import SensorPort
 from core.domain.samples import (
     RawSensorSample,
