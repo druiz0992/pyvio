@@ -1,20 +1,22 @@
 import matplotlib.pyplot as plt
 from collections import deque
 from matplotlib.animation import FuncAnimation
+from typing import List
 
 from core.domain.samples import SensorType
 from .stage import Stage
 
 
 class LiveVisualizer:
-    def __init__(self, stage: Stage, maxlen=1000):
+    def __init__(self, stage: Stage, sensors: List[SensorType], maxlen=1000):
         self.stage = stage
-        self.buffers = {s: deque(maxlen=maxlen) for s in SensorType}
+        self._sensors = sensors
+        self.buffers = {s: deque(maxlen=maxlen) for s in sensors}
 
         self.fig, self.axs = plt.subplots(3, 1, figsize=(8, 6))
         self.lines = {}
 
-        for i, sensor in enumerate(SensorType):
+        for i, sensor in enumerate(sensors):
             self.lines[sensor] = [
                 self.axs[i].plot([], [], label=axis)[0] for axis in "XYZ"
             ]
@@ -23,11 +25,11 @@ class LiveVisualizer:
 
         plt.ion()
 
-        for s in SensorType:
+        for s in self._sensors:
             self.stage.subscribe(s, lambda sample, s=s: self.buffers[s].append(sample))
 
     def update_plot(self, frame):
-        for i, sensor in enumerate(SensorType):
+        for i, sensor in enumerate(self._sensors):
             window = list(self.buffers[sensor])
             if not window:
                 continue

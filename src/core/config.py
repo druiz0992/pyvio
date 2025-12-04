@@ -1,19 +1,20 @@
-from re import A
 import yaml
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 from core.domain.samples import SensorType, SampleEncoding
 from core.domain.sync_params import GPIO, SyncParams, parse_gpio
 
 
 DEFAULT_SENSITIVITY = 1
 DEFAULT_SAMPLE_WIDTH = 16
-DEFAULT_CLOCK_HZ = 48_000_000
 DEFAULT_BAUD_RATE = 115200
 DEFAULT_PORT_NAME = "/dev/ttyACM1"
 DEFAULT_ENCODING = SampleEncoding.BINARY
 DEFAULT_SAMPLE_ANIMATION = False
 DEFAULT_SYNC_GPIO: GPIO = GPIO.NONE
+DEFAULT_SYNC_FREQ_HZ = 0
+DEFAULT_PHYPHOX_IP = "192.168.1.34"  
+DEFAULT_PHYPHOX_SENSORS = SensorType.gps_list()
 
 
 class Config:
@@ -42,7 +43,7 @@ class Config:
         raw_sens = sensors.get("sensitivity", {})
 
         if sensor is None:
-            return {stype: raw_sens[stype.name] for stype in SensorType}
+            return {stype: raw_sens[stype.name] for stype in SensorType if stype in SensorType.imu_list()}
 
         if sensor.name not in raw_sens:
             raise KeyError(f"Sensitivity not found for sensor {sensor.name}")
@@ -55,15 +56,11 @@ class Config:
         raw_width = sensors.get("sample_width", {})
 
         if sensor is None:
-            return {stype: raw_width[stype.name] for stype in SensorType}
+            return {stype: raw_width[stype.name] for stype in SensorType if stype in SensorType.imu_list()}
 
         if sensor.name not in raw_width:
             raise KeyError(f"Sample wifth not found for sensor {sensor.name}")
         return raw_width[sensor.name]
-
-    @property
-    def clock_freq_hz(self):
-        return self._data.get("clock_freq_hz", DEFAULT_CLOCK_HZ)
 
     @property
     def sample_encoding(self) -> SampleEncoding:
@@ -92,10 +89,11 @@ class Config:
         imu_props = sync_props.get("imu", {})
 
         if not imu_props:
-            return SyncParams(DEFAULT_SYNC_GPIO)
+            return SyncParams(DEFAULT_SYNC_GPIO, DEFAULT_SYNC_FREQ_HZ)
 
         return SyncParams(
             gpio=parse_gpio(imu_props.get("gpio", DEFAULT_SYNC_GPIO.value)),
+            clock_freq_hz=imu_props.get("clock_freq_hz", DEFAULT_SYNC_FREQ_HZ)
         )
 
     def gps_sync(self) -> SyncParams:
@@ -103,8 +101,44 @@ class Config:
         gps_props = sync_props.get("gps", {})
 
         if not gps_props:
-            return SyncParams(DEFAULT_SYNC_GPIO)
+            return SyncParams(DEFAULT_SYNC_GPIO, DEFAULT_SYNC_FREQ_HZ)
 
         return SyncParams(
             gpio=parse_gpio(gps_props.get("gpio", DEFAULT_SYNC_GPIO.value)),
+            clock_freq_hz=gps_props.get("clock_freq_hz", DEFAULT_SYNC_FREQ_HZ)
         )
+        
+    def phyphox_ip(self) -> str:
+        phyphox_props = self._data.get("phyphox", {})
+        
+        if not phyphox_props:
+            return DEFAULT_PHYPHOX_IP
+        
+        return phyphox_props.get("ip", DEFAULT_PHYPHOX_IP)
+        
+    def phyphox_sensors(self) -> List[SensorType]:
+        phyphox_props = self._data.get("phyphox", {})
+        
+        if not phyphox_props:
+            return DEFAULT_PHYPHOX_SENSORS
+        
+        sensor_names = phyphox_props.get("sensors", [])
+        if len(sensor_names):
+            return DEFAULT_PHYPHOX_SENSORS
+        
+        sensors: List[SensorType] = []
+        
+        for name in sensor_names:
+            try:
+                new_sensor = SensorType[name]
+            except KeyError:
+                raise ValueError(f"Unknown sensor type: {name}")
+            
+            if new_sensor not in  SensorType.gps_list():
+                 raise ValueError(f"Sensor '{name}' is not allowed for phyphox")
+            
+            sensors.append(new_sensor)
+            
+        return sensors
+           
+        

@@ -2,6 +2,7 @@ import logging
 import time
 
 from adapters.serial import SerialSensorAdapter
+from adapters.phyphox import PhyphoxSensorAdapter
 from core.ports.sensor import SensorPort
 from core.domain.pipeline.visualizer import LiveVisualizer
 from core.domain.pipeline.ahrs import Ahrs
@@ -17,16 +18,18 @@ logging.basicConfig(
 
 def main():
     cfg = Config("./config.yaml")
-    sensors = SensorType.list()
-    sensor_adapter: SensorPort = SerialSensorAdapter(sensors, cfg)
+    imu: SensorPort = SerialSensorAdapter(cfg)
+    phyphox: SensorPort = PhyphoxSensorAdapter(cfg)
 
-    # visualizer = LiveVisualizer(sensor_adapter.stage, maxlen=1000)
+    imu.start()
+    phyphox.start()
+    
+    #visualizer = LiveVisualizer(phyphox.stage, SensorType.gps_list())
     #ahrs = Ahrs(sensor_adapter.stage, maxlen=100)
 
-    sensor_adapter.start()
     #ahrs.start_animation(interval=50)
 
-    # visualizer.start_animation(interval=50)
+    #visualizer.start_animation(interval=50)
     while True:
         time.sleep(0.1)
 

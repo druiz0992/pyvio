@@ -9,6 +9,8 @@ class SensorType(Enum):
     GYROSCOPE = "G"
     MAGNETOMETER = "M"
     TIMER = "T"
+    GPS = "P"
+    ODOMETRY = "O"
 
     @classmethod
     def from_binary(cls, code: int) -> SensorType | None:
@@ -24,7 +26,25 @@ class SensorType(Enum):
     def list(cls) -> list["SensorType"]:
         """Return a list of all SensorType variants."""
         return list(cls)
-
+    
+    @classmethod
+    def imu_list(cls) -> list["SensorType"]:
+        """Return a list of IMU SensorType variants."""
+        return [
+            cls.ACCELEROMETER,
+            cls.GYROSCOPE,
+            cls.MAGNETOMETER,
+            cls.TIMER,  
+        ]
+        
+    @classmethod
+    def gps_list(cls) -> list["SensorType"]:
+        """Return a list of GPS SensorType variants."""
+        return [
+            cls.GPS,
+            cls.ODOMETRY
+        ]
+        
 
 class SampleEncoding(Enum):
     BINARY = 0
@@ -100,3 +120,13 @@ class SensorSample:
 
     def as_array(self) -> np.ndarray:
         return np.array([self.x, self.y, self.z], dtype=float)
+ 
+    @classmethod
+    def from_raw(cls, sample: "RawSensorSample") -> "SensorSample":
+        return cls(
+            sensor=sample.sensor,
+            timestamp=sample.timestamp,
+            x=float(sample.x),
+            y=float(sample.y),
+            z=float(sample.z)
+        )   

@@ -17,7 +17,6 @@ from utils.stats_deque import TIMESTAMP_DIFF
 class SerialSensorAdapter(SensorPort):
     def __init__(
         self,
-        sensors: List[SensorType],
         cfg: Config,
         maxlen: int = 1000,
         window: int = 50,
@@ -27,15 +26,15 @@ class SerialSensorAdapter(SensorPort):
         self.sensor_sensitivity = cfg.sensor_sensitivity()
         self.sample_width = cfg.sensor_sample_width()
         self._running_ = True
-        self.clock = Clock(cfg.clock_freq_hz, cfg.imu_sync())
+        self.clock = Clock(cfg.imu_sync())
 
         self.stage = Stage[SensorSample](
-            sensors=sensors,
+            sensors=SensorType.imu_list(),
             maxlen=maxlen,
             window=window,
             stats=[TIMESTAMP_DIFF],
         )
-
+        
     def stop(self):
         self._running_ = False
 
@@ -44,7 +43,6 @@ class SerialSensorAdapter(SensorPort):
         t.start()
 
     def put(self, sample: RawSensorSample):
-        import time
         """Append sample to the corresponding sensor queue."""
         if sample.sensor != SensorType.TIMER:
             processed_sample = self._apply_sensitivity(sample)

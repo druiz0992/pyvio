@@ -8,6 +8,7 @@ class GPIO(Enum):
 
 
 DEFAULT_SYNC_GPIO = GPIO.NONE
+DEFAULT_FREQ_HZ = 0
 
 
 def parse_gpio(value) -> GPIO:
@@ -40,9 +41,11 @@ def parse_gpio(value) -> GPIO:
 @dataclass
 class SyncParams:
     gpio: GPIO
+    clock_freq_hz: int
 
     @staticmethod
     def from_dict(imu_props: dict) -> "SyncParams":
         gpio_raw = imu_props.get("gpio", DEFAULT_SYNC_GPIO.value)
+        clock_freq_hz = imu_props.get("clock_freq_hz", DEFAULT_FREQ_HZ)
         gpio = parse_gpio(gpio_raw)
-        return SyncParams(gpio)
+        return SyncParams(gpio, clock_freq_hz )
