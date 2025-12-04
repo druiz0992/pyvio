@@ -8,6 +8,9 @@ class SensorType(Enum):
     ACCELEROMETER = "A"
     GYROSCOPE = "G"
     MAGNETOMETER = "M"
+    TIMER = "T"
+    GPS = "P"
+    ODOMETRY = "O"
 
     @classmethod
     def from_binary(cls, code: int) -> SensorType | None:
@@ -15,6 +18,7 @@ class SensorType(Enum):
             0: cls.MAGNETOMETER,
             1: cls.ACCELEROMETER,
             2: cls.GYROSCOPE,
+            3: cls.TIMER,
         }
         return mapping.get(code)
 
@@ -22,7 +26,25 @@ class SensorType(Enum):
     def list(cls) -> list["SensorType"]:
         """Return a list of all SensorType variants."""
         return list(cls)
-
+    
+    @classmethod
+    def imu_list(cls) -> list["SensorType"]:
+        """Return a list of IMU SensorType variants."""
+        return [
+            cls.ACCELEROMETER,
+            cls.GYROSCOPE,
+            cls.MAGNETOMETER,
+            cls.TIMER,  
+        ]
+        
+    @classmethod
+    def gps_list(cls) -> list["SensorType"]:
+        """Return a list of GPS SensorType variants."""
+        return [
+            cls.GPS,
+            cls.ODOMETRY
+        ]
+        
 
 class SampleEncoding(Enum):
     BINARY = 0
@@ -51,14 +73,10 @@ class RawSensorSample:
         cls,
         sensor: SensorType,
         data: bytes,
-        unwrapper,
-        ticks_ns,
-        ticks_rem,
-        clock_freq_hz,
+        clock,
     ) -> RawSensorSample:
         raw_ts = int.from_bytes(data[cls.TIMESTAMP_SLICE], "little")
-        full_ts = unwrapper.unwrap(sensor, raw_ts)
-        timestamp = full_ts * ticks_ns + (full_ts * ticks_rem) // clock_freq_hz
+        timestamp = clock.get_timestamp(sensor, raw_ts)
 
         x = int.from_bytes(data[cls.X_SLICE], "little", signed=False)
         y = int.from_bytes(data[cls.Y_SLICE], "little", signed=False)
@@ -70,10 +88,7 @@ class RawSensorSample:
     def from_str(
         cls,
         data: str,
-        unwrapper,
-        ticks_ns,
-        ticks_rem,
-        clock_freq_hz,
+        clock,
     ) -> RawSensorSample:
         parts = data.strip().split(",")
         if len(parts) != 5:
@@ -87,8 +102,7 @@ class RawSensorSample:
             raise ValueError(f"Unknown sensor type: {sensor_char}")
 
         # Convert numeric fields
-        full_ts = unwrapper.unwrap(sensor_type, int(ts_str))
-        timestamp = full_ts * ticks_ns + (full_ts * ticks_rem) // clock_freq_hz
+        timestamp = clock.get_timestamp(sensor_type, int(ts_str))
         x = int(x_str)
         y = int(y_str)
         z = int(z_str)
@@ -106,3 +120,13 @@ class SensorSample:
 
     def as_array(self) -> np.ndarray:
         return np.array([self.x, self.y, self.z], dtype=float)
+ 
+    @classmethod
+    def from_raw(cls, sample: "RawSensorSample") -> "SensorSample":
+        return cls(
+            sensor=sample.sensor,
+            timestamp=sample.timestamp,
+            x=float(sample.x),
+            y=float(sample.y),
+            z=float(sample.z)
+        )   

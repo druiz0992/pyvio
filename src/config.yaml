@@ -3,16 +3,31 @@ sensors:
     ACCELEROMETER: 0.0096138  # m/s^2 per bit
     GYROSCOPE: 0.00875        # m dps/LSB
     MAGNETOMETER: 1.5         # mGauss per bit
+    TIMER: 1.0         # mGauss per bit
   sample_width:
     ACCELEROMETER: 12
     GYROSCOPE: 16
     MAGNETOMETER: 16
+    TIMER: 16
 
-clock_freq_hz: 48000000
 
 sample_encoding: BINARY
 sample_animation: true
 
+sync:
+  imu:
+    gpio: GPIO4
+    clock_freq_hz: 48000000
+  gps: 
+    gpio: NONE
+
+
 serial:
   baud_rate: 115200
   port_name: /dev/imu
+
+phyphox:
+  ip: 192.168.1.34
+  sensors: 
+   - GPS
+   - ODOMETRY

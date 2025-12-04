@@ -66,7 +66,7 @@ class Ahrs:
         )
 
     def update_filter(self, frame=None):
-        for i, sensor in enumerate(SensorType):
+        for i, sensor in enumerate(SensorType.imu_list()):
             try:
                 self.last_sample[i] = self.buffers[sensor].popleft()
             except IndexError:

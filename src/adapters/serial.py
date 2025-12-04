@@ -9,7 +9,7 @@ from core.domain.samples import (
     SampleEncoding,
 )
 from core.config import Config
-from core.domain.timestamp import TimestampUnwrapper
+from core.services.clock.clock import Clock
 from core.domain.pipeline.stage import Stage
 from utils.stats_deque import TIMESTAMP_DIFF
 
@@ -17,7 +17,6 @@ from utils.stats_deque import TIMESTAMP_DIFF
 class SerialSensorAdapter(SensorPort):
     def __init__(
         self,
-        sensors: List[SensorType],
         cfg: Config,
         maxlen: int = 1000,
         window: int = 50,
@@ -26,20 +25,16 @@ class SerialSensorAdapter(SensorPort):
         self.encoding = cfg.sample_encoding
         self.sensor_sensitivity = cfg.sensor_sensitivity()
         self.sample_width = cfg.sensor_sample_width()
-        self.clock_freq_hz = cfg.clock_freq_hz
         self._running_ = True
-        self.unwrapper = TimestampUnwrapper()
-
-        self._ticks_ns = 1_000_000_000 // self.clock_freq_hz
-        self._ticks_rem = 1_000_000_000 % self.clock_freq_hz
+        self.clock = Clock(cfg.imu_sync())
 
         self.stage = Stage[SensorSample](
-            sensors=sensors,
+            sensors=SensorType.imu_list(),
             maxlen=maxlen,
             window=window,
             stats=[TIMESTAMP_DIFF],
         )
-
+        
     def stop(self):
         self._running_ = False
 
@@ -49,8 +44,11 @@ class SerialSensorAdapter(SensorPort):
 
     def put(self, sample: RawSensorSample):
         """Append sample to the corresponding sensor queue."""
-        processed_sample = self._apply_sensitivity(sample)
-        self.stage.put(sample.sensor, processed_sample)
+        if sample.sensor != SensorType.TIMER:
+            processed_sample = self._apply_sensitivity(sample)
+            self.stage.put(sample.sensor, processed_sample)
+        else:
+            self.clock.update_mcu_timestamp(sample)
 
     def get(self, sensor: SensorType) -> SensorSample | None:
         """Get oldest sample from specific sensor queue."""
@@ -76,10 +74,7 @@ class SerialSensorAdapter(SensorPort):
                 try:
                     sample = RawSensorSample.from_str(
                         line,
-                        self.unwrapper,
-                        self._ticks_ns,
-                        self._ticks_rem,
-                        self.clock_freq_hz,
+                        self.clock,
                     )
                 except ValueError:
                     continue
@@ -103,10 +98,7 @@ class SerialSensorAdapter(SensorPort):
                 sample = RawSensorSample.from_bytes(
                     sensor_type,
                     data,
-                    self.unwrapper,
-                    self._ticks_ns,
-                    self._ticks_rem,
-                    self.clock_freq_hz,
+                    self.clock,
                 )
 
                 self.put(sample)
