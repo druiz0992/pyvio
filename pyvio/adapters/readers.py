@@ -1,8 +1,8 @@
 import socket
 import os
-from typing import Optional
 
 from pyvio.core.ports.reader import ReaderPort
+
 
 class FileReader(ReaderPort):
     def __init__(self, filename: str, mode: str = "rb"):
@@ -14,18 +14,18 @@ class FileReader(ReaderPort):
         if not os.path.exists(filename):
             raise FileNotFoundError(f"File {filename} does not exist")
         self.file = open(filename, mode)
-    
+
     def read(self, size: int = -1) -> bytes:
         """
         Read up to `size` bytes from the file. If size=-1, read entire file.
         """
         return self.file.read(size)
-    
+
     def close(self):
         self.file.close()
 
 
-class UDPSocketReader:
+class UDPSocketReader(ReaderPort):
     def __init__(self, host: str, port: int):
         """
         UDP socket reader adapter.

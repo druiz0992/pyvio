@@ -13,7 +13,7 @@ class LiveVisualizer:
         self._sensors = sensors
         self.buffers = {s: deque(maxlen=maxlen) for s in sensors}
 
-        self.fig, self.axs = plt.subplots(3, 1, figsize=(8, 6))
+        self.fig, self.axs = plt.subplots(len(sensors), 1, figsize=(8, 6))
         self.lines = {}
 
         for i, sensor in enumerate(sensors):
