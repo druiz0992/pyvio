@@ -1,6 +1,7 @@
 from typing import Callable, Dict, Generic, TypeVar, List, Optional
-from core.domain.samples import SensorType
-from utils.stats_deque import StatsQueue, StatSpec, TIMESTAMP_DIFF
+
+from pyvio.core.domain.samples import SensorType
+from pyvio.utils.stats_deque import StatsQueue, StatSpec, TIMESTAMP_DIFF
 
 T = TypeVar("T")
 

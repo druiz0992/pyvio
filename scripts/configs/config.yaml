@@ -31,3 +31,7 @@ phyphox:
   sensors: 
    - GPS
    - ODOMETRY
+
+stream:
+  filename: ./data/test1.pyvio
+  ip: 192.168.1.58:50004

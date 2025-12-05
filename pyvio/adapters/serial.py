@@ -1,17 +1,18 @@
 import serial
 import threading
 from typing import List, Callable
-from core.ports.sensor import SensorPort
-from core.domain.samples import (
+
+from ..core.ports.sensor import SensorPort
+from ..core.domain.samples import (
     RawSensorSample,
     SensorType,
     SensorSample,
     SampleEncoding,
 )
-from core.config import Config
-from core.services.clock.clock import Clock
-from core.domain.pipeline.stage import Stage
-from utils.stats_deque import TIMESTAMP_DIFF
+from ..core.config import Config
+from ..core.services.clock.clock import Clock
+from ..core.domain.pipeline.stage import Stage
+from ..utils.stats_deque import TIMESTAMP_DIFF
 
 
 class SerialSensorAdapter(SensorPort):

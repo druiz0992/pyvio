@@ -1,9 +1,8 @@
-from core.domain.sync_params import SyncParams
-from utils.kalman.simple import KalmanFilter
 from collections import deque
-from threading import Lock
 from typing import Tuple
 
+from pyvio.core.domain.params.sync_params import SyncParams
+from pyvio.utils.kalman.simple import KalmanFilter
 
 class Estimator:
     """Estimates drift and offset."""
