@@ -2,7 +2,7 @@ from typing import Callable
 import threading
 
 from pyvio.adapters.pps_gpio import PulsePerSecondGPIO
-from pyvio.core.domain.sync_params import GPIO
+from pyvio.core.domain.params.sync_params import GPIO
 
 
 class PPSMonitor:

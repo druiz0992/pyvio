@@ -2,7 +2,7 @@ from .pps import PPSMonitor
 from .unwrap import TimestampUnwrapper
 from .estimator import Estimator
 from pyvio.core.domain.samples import RawSensorSample, SensorType
-from pyvio.core.domain.sync_params import SyncParams
+from pyvio.core.domain.params.sync_params import SyncParams
 
 
 class Clock:

@@ -2,8 +2,10 @@ import yaml
 from pathlib import Path
 from typing import Any, Dict, Optional, List
 
+from pyvio.core.domain.params.stream_params import StreamParams
+
 from ..core.domain.samples import SensorType, SampleEncoding
-from ..core.domain.sync_params import GPIO, SyncParams, parse_gpio
+from ..core.domain.params.sync_params import GPIO, SyncParams, parse_gpio
 
 
 DEFAULT_SENSITIVITY = 1
@@ -141,5 +143,10 @@ class Config:
             sensors.append(new_sensor)
             
         return sensors
+    
+    def stream_params(self) -> StreamParams:
+        stream_props = self._data.get("stream", {})
+        return StreamParams.from_dict(stream_props)
+        
            
         

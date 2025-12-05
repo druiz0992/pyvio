@@ -1,7 +1,7 @@
 from collections import deque
 from typing import Tuple
 
-from pyvio.core.domain.sync_params import SyncParams
+from pyvio.core.domain.params.sync_params import SyncParams
 from pyvio.utils.kalman.simple import KalmanFilter
 
 class Estimator:

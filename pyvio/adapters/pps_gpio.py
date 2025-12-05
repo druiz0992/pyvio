@@ -4,7 +4,7 @@ from typing import Callable
 import time
 
 from pyvio.core.ports.pps import PulsePerSecondPort
-from pyvio.core.domain.sync_params import GPIO
+from pyvio.core.domain.params.sync_params import GPIO
 
 
 class PulsePerSecondGPIO(PulsePerSecondPort):

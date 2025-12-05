@@ -21,10 +21,13 @@ class PhyphoxSensorAdapter(SensorPort):
         cfg: Config,
         maxlen: int = 100,
         window: int = 50,
+        connect_retries: int = 5
     ):
         self._ip = cfg.phyphox_ip()
         self._sensors = cfg.phyphox_sensors()
         self._running_ = True
+        
+        self._connect_retries = connect_retries
 
         self.stage = Stage[SensorSample](
             sensors=self._sensors,
@@ -149,8 +152,11 @@ class PhyphoxSensorAdapter(SensorPort):
                 else:
                     n_no_data += 1
                 
-                if n_no_data == 10: 
-                    raise ValueError(f"Phyphox app not responding")
+            else:
+                n_no_data +=1
+                
+            if n_no_data == self._connect_retries: 
+                raise ValueError(f"Phyphox app not responding")
                 
             time.sleep(1)
             
