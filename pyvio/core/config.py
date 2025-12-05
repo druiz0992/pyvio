@@ -1,8 +1,9 @@
 import yaml
 from pathlib import Path
 from typing import Any, Dict, Optional, List
-from core.domain.samples import SensorType, SampleEncoding
-from core.domain.sync_params import GPIO, SyncParams, parse_gpio
+
+from ..core.domain.samples import SensorType, SampleEncoding
+from ..core.domain.sync_params import GPIO, SyncParams, parse_gpio
 
 
 DEFAULT_SENSITIVITY = 1

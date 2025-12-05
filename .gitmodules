@@ -1,0 +1,3 @@
+[submodule "3rdparty/f3-sensor-hub"]
+	path = 3rdparty/f3-sensor-hub
+	url = git@github.com:druiz0992/f3-sensor-hub.git

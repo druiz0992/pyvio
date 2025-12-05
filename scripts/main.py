@@ -1,13 +1,13 @@
 import logging
 import time
 
-from adapters.serial import SerialSensorAdapter
-from adapters.phyphox import PhyphoxSensorAdapter
-from core.ports.sensor import SensorPort
-from core.domain.pipeline.visualizer import LiveVisualizer
-from core.domain.pipeline.ahrs import Ahrs
-from core.domain.samples import SensorType
-from core.config import Config
+from pyvio.adapters.serial import SerialSensorAdapter
+from pyvio.adapters.phyphox import PhyphoxSensorAdapter
+from pyvio.core.ports.sensor import SensorPort
+from pyvio.core.domain.pipeline.visualizer import LiveVisualizer
+from pyvio.core.domain.pipeline.ahrs import Ahrs
+from pyvio.core.domain.samples import SensorType
+from pyvio.core.config import Config
 
 
 logging.basicConfig(
@@ -17,7 +17,7 @@ logging.basicConfig(
 
 
 def main():
-    cfg = Config("./config.yaml")
+    cfg = Config("./configs/config.yaml")
     imu: SensorPort = SerialSensorAdapter(cfg)
     phyphox: SensorPort = PhyphoxSensorAdapter(cfg)
 
@@ -25,9 +25,9 @@ def main():
     phyphox.start()
     
     #visualizer = LiveVisualizer(phyphox.stage, SensorType.gps_list())
-    #ahrs = Ahrs(sensor_adapter.stage, maxlen=100)
+    ahrs = Ahrs(imu.stage, maxlen=100)
 
-    #ahrs.start_animation(interval=50)
+    ahrs.start_animation(interval=50)
 
     #visualizer.start_animation(interval=50)
     while True:

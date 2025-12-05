@@ -3,8 +3,8 @@ from gpiod.line import Direction, Edge, Clock
 from typing import Callable
 import time
 
-from core.ports.pps import PulsePerSecondPort
-from core.domain.sync_params import GPIO
+from pyvio.core.ports.pps import PulsePerSecondPort
+from pyvio.core.domain.sync_params import GPIO
 
 
 class PulsePerSecondGPIO(PulsePerSecondPort):

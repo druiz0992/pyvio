@@ -1,5 +1,6 @@
 from typing import Dict
-from core.domain.samples import SensorType
+
+from pyvio.core.domain.samples import SensorType
 
 
 class TimestampUnwrapper:

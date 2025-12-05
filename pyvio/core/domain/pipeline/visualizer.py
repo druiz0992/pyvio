@@ -3,7 +3,7 @@ from collections import deque
 from matplotlib.animation import FuncAnimation
 from typing import List
 
-from core.domain.samples import SensorType
+from pyvio.core.domain.samples import SensorType
 from .stage import Stage
 
 

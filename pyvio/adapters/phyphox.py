@@ -3,15 +3,15 @@ import requests
 import time
 from typing import List, Callable, Tuple
 
-from core.ports.sensor import SensorPort
-from core.domain.samples import (
+from pyvio.core.ports.sensor import SensorPort
+from pyvio.core.domain.samples import (
     RawSensorSample,
     SensorType,
     SensorSample,
 )
-from core.config import Config
-from core.domain.pipeline.stage import Stage
-from utils.stats_deque import TIMESTAMP_DIFF
+from pyvio.core.config import Config
+from pyvio.core.domain.pipeline.stage import Stage
+from pyvio.utils.stats_deque import TIMESTAMP_DIFF
 
 
 

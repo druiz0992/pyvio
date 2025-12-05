@@ -5,14 +5,14 @@ from ahrs.filters import Madgwick
 import numpy as np
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-from core.domain.samples import SensorType, SensorSample
+from pyvio.core.domain.samples import SensorType, SensorSample
 from .stage import Stage
 
 
 class Ahrs:
     def __init__(self, stage: Stage, maxlen=100):
         self.stage = stage
-        self.buffers = {s: deque(maxlen=maxlen) for s in SensorType}
+        self.buffers = {s: deque(maxlen=maxlen) for s in SensorType.imu_list()}
         self.madgwick = Madgwick()
         self.q = np.array([1.0, 0.0, 0.0, 0.0])
 
@@ -52,7 +52,7 @@ class Ahrs:
         plt.ion()
 
         # Subscribe to sensors
-        for s in SensorType:
+        for s in SensorType.imu_list():
             self.stage.subscribe(s, lambda sample, s=s: self.buffers[s].append(sample))
 
     def quat_to_rotmat(self, q):
