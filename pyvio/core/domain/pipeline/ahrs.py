@@ -5,22 +5,23 @@ from ahrs.filters import Madgwick
 import numpy as np
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-from pyvio.core.domain.samples import SensorType, SensorSample
+from pyvio.core.domain.sample import SensorSample
+from pyvio.core.ports.sample import SampleType
 from .stage import Stage
 
 
 class Ahrs:
     def __init__(self, stage: Stage, maxlen=100):
         self.stage = stage
-        self.buffers = {s: deque(maxlen=maxlen) for s in SensorType.imu_list()}
+        self.buffers = {s: deque(maxlen=maxlen) for s in SampleType.imu_list()}
         self.madgwick = Madgwick()
         self.q = np.array([1.0, 0.0, 0.0, 0.0])
 
         # Last sensor samples
         self.last_sample = [
-            SensorSample(SensorType.ACCELEROMETER, 0, 0, 0, 0),
-            SensorSample(SensorType.GYROSCOPE, 0, 0, 0, 0),
-            SensorSample(SensorType.MAGNETOMETER, 0, 0, 0, 0),
+            SensorSample(SampleType.ACCELEROMETER, 0, 0, 0, 0),
+            SensorSample(SampleType.GYROSCOPE, 0, 0, 0, 0),
+            SensorSample(SampleType.MAGNETOMETER, 0, 0, 0, 0),
         ]
 
         # Cube geometry
@@ -52,7 +53,7 @@ class Ahrs:
         plt.ion()
 
         # Subscribe to sensors
-        for s in SensorType.imu_list():
+        for s in SampleType.imu_list():
             self.stage.subscribe(s, lambda sample, s=s: self.buffers[s].append(sample))
 
     def quat_to_rotmat(self, q):
@@ -66,7 +67,7 @@ class Ahrs:
         )
 
     def update_filter(self, frame=None):
-        for i, sensor in enumerate(SensorType.imu_list()):
+        for i, sensor in enumerate(SampleType.imu_list()):
             try:
                 self.last_sample[i] = self.buffers[sensor].popleft()
             except IndexError:

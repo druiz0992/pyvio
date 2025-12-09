@@ -2,10 +2,9 @@ import serial
 import threading
 from typing import List, Callable
 
-from ..core.ports.sensor import SensorPort
-from ..core.domain.samples import (
+from ..core.ports.sensor import SensorPort, SampleType
+from ..core.domain.sample import (
     RawSensorSample,
-    SensorType,
     SensorSample,
     SampleEncoding,
 )
@@ -30,7 +29,7 @@ class SerialSensorAdapter(SensorPort):
         self.clock = Clock(cfg.imu_sync())
 
         self.stage = Stage[SensorSample](
-            sensors=SensorType.imu_list(),
+            sensors=SampleType.imu_list(),
             maxlen=maxlen,
             window=window,
             stats=[TIMESTAMP_DIFF],
@@ -45,21 +44,21 @@ class SerialSensorAdapter(SensorPort):
 
     def put(self, sample: RawSensorSample):
         """Append sample to the corresponding sensor queue."""
-        if sample.sensor != SensorType.TIMER:
+        if sample.sensor != SampleType.TIMER:
             processed_sample = self._apply_sensitivity(sample)
             self.stage.put(sample.sensor, processed_sample)
         else:
             self.clock.update_mcu_timestamp(sample)
 
-    def get(self, sensor: SensorType) -> SensorSample | None:
+    def get(self, sensor: SampleType) -> SensorSample | None:
         """Get oldest sample from specific sensor queue."""
         return self.stage.get(sensor)
 
-    def get_buffer(self, sensor: SensorType) -> List[SensorSample]:
+    def get_buffer(self, sensor: SampleType) -> List[SensorSample]:
         """Return a snapshot of the internal queue."""
         return self.stage.get_buffer(sensor)
 
-    def subscribe(self, sensor: SensorType, callback: Callable[[SensorSample], None]):
+    def subscribe(self, sensor: SampleType, callback: Callable[[SensorSample], None]):
         """Observers will be called with each processed SensorSample."""
         self.stage.subscribe(sensor, callback)
 
@@ -88,7 +87,7 @@ class SerialSensorAdapter(SensorPort):
             while self._running_:
                 # Synchronize chunk with beginning of sensor data (sensor type)
                 code = self.ser.read(1)
-                if not code or (sensor_type := SensorType.from_binary(code[0])) is None:
+                if not code or (sensor_type := SampleType.from_binary(code[0])) is None:
                     continue
 
                 data = self.ser.read(sample_size - 1)

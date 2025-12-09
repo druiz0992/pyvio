@@ -1,7 +1,8 @@
 from .pps import PPSMonitor
 from .unwrap import TimestampUnwrapper
 from .estimator import Estimator
-from pyvio.core.domain.samples import RawSensorSample, SensorType
+from pyvio.core.domain.sample import RawSensorSample
+from pyvio.core.ports.sample import SampleType
 from pyvio.core.domain.params.sync_params import SyncParams
 
 
@@ -16,10 +17,10 @@ class Clock:
         self._pps = PPSMonitor(sync_params.gpio, self._estimator.filter)
         
 
-    def get_timestamp(self, sensor: SensorType, raw_ts: int) -> int:
+    def get_timestamp(self, sensor: SampleType, raw_ts: int) -> int:
         timestamp = self._unwrapper.unwrap(sensor, raw_ts)
         
-        if sensor == SensorType.TIMER:
+        if sensor == SampleType.TIMER:
             return timestamp
         else:
             drift, offset = self._estimator.get_params()

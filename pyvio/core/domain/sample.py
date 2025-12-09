@@ -1,64 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Self
 from enum import Enum
 import struct
 import numpy as np
 
-
-class SensorType(Enum):
-    ACCELEROMETER = "A"
-    GYROSCOPE = "G"
-    MAGNETOMETER = "M"
-    TIMER = "T"
-    GPS = "P"
-    ODOMETRY = "O"
-
-    @classmethod
-    def from_binary(cls, code: int) -> SensorType | None:
-        mapping = {
-            0: cls.MAGNETOMETER,
-            1: cls.ACCELEROMETER,
-            2: cls.GYROSCOPE,
-            3: cls.TIMER,
-            4: cls.GPS,
-            5: cls.ODOMETRY,
-        }
-        return mapping.get(code)
-
-    def to_binary(self) -> int:
-        """Return the integer code corresponding to this SensorType."""
-        mapping = {
-            self.MAGNETOMETER: 0,
-            self.ACCELEROMETER: 1,
-            self.GYROSCOPE: 2,
-            self.TIMER: 3,
-            self.GPS: 4,
-            self.ODOMETRY: 5,
-        }
-        if self not in mapping:
-            raise ValueError(f"SensorType {self} cannot be serialized to binary code")
-        return mapping[self]
-
-    @classmethod
-    def list(cls) -> list["SensorType"]:
-        """Return a list of all SensorType variants."""
-        return list(cls)
-
-    @classmethod
-    def imu_list(cls) -> list["SensorType"]:
-        """Return a list of IMU SensorType variants."""
-        return [
-            cls.ACCELEROMETER,
-            cls.GYROSCOPE,
-            cls.MAGNETOMETER,
-            cls.TIMER,
-        ]
-
-    @classmethod
-    def gps_list(cls) -> list["SensorType"]:
-        """Return a list of GPS SensorType variants."""
-        return [cls.GPS, cls.ODOMETRY]
-
+from pyvio.core.ports.sample import SamplePort, SampleType
 
 class SampleEncoding(Enum):
     BINARY = 0
@@ -70,7 +17,7 @@ class SampleEncoding(Enum):
 
 @dataclass
 class RawSensorSample:
-    sensor: SensorType
+    sensor: SampleType
     timestamp: int
     x: int
     y: int
@@ -85,7 +32,7 @@ class RawSensorSample:
     @classmethod
     def from_bytes(
         cls,
-        sensor: SensorType,
+        sensor: SampleType,
         data: bytes,
         clock,
     ) -> RawSensorSample:
@@ -111,7 +58,7 @@ class RawSensorSample:
         sensor_char, ts_str, x_str, y_str, z_str = parts
 
         try:
-            sensor_type = SensorType(sensor_char)
+            sensor_type = SampleType(sensor_char)
         except ValueError:
             raise ValueError(f"Unknown sensor type: {sensor_char}")
 
@@ -125,8 +72,8 @@ class RawSensorSample:
 
 
 @dataclass
-class SensorSample:
-    sensor: SensorType
+class SensorSample(SamplePort):
+    sensor: SampleType
     timestamp: int
     x: float
     y: float
@@ -162,16 +109,69 @@ class SensorSample:
         )
 
     @classmethod
-    def from_bytes(cls, data: bytes) -> "SensorSample":
+    def from_bytes(cls, data: bytes) -> Self:
         """
         Deserialize from bytes back to SensorSample.
         """
         sensor_val, timestamp, x, y, z = struct.unpack(cls.STRUCT_FORMAT, data)
-        sensor_type = SensorType.from_binary(sensor_val)
-        sensor = SensorType(sensor_type)
+        sensor_type = SampleType.from_binary(sensor_val)
+        sensor = SampleType(sensor_type)
         return cls(sensor, timestamp, x, y, z)
 
     @classmethod
     def sample_size(cls) -> int:
         """Return the number of bytes required to serialize one sample."""
         return struct.calcsize(cls.STRUCT_FORMAT)
+    
+    @classmethod
+    def sample_type(cls) -> SampleType:
+        return cls.sensor
+
+
+@dataclass
+class IMUSample(SamplePort):
+    sensor: SampleType
+    timestamp: int
+    acc: np.ndarray
+    gyro: np.ndarray
+
+    STRUCT_FORMAT = "<Q" + "fff" + "fff" 
+
+    def as_array(self) -> np.ndarray:
+        t_vec = self.timestamp
+        acc_vec = self.acc
+        gyro_vec = self.gyro
+        return np.concatenate([t_vec, acc_vec, gyro_vec])
+
+    def to_bytes(self) -> bytes:
+        """
+        Serialize the sample to bytes using struct.
+        Format:
+        - sensor ID: unsigned short (2 bytes)
+        - timestamp: unsigned long long (8 bytes)
+        - x, y, z: float (4 bytes each)
+        Total: 2 + 8 + 12 = 22 bytes
+        """
+        sensor_type = self.sensor.to_binary()
+        return struct.pack(
+            self.STRUCT_FORMAT, sensor_type, self.timestamp, self.acc, self.gyro
+        )
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> Self:
+        """
+        Deserialize from bytes back to SensorSample.
+        """
+        sensor_val, timestamp, acc, gyro = struct.unpack(cls.STRUCT_FORMAT, data)
+        sensor_type = SampleType.from_binary(sensor_val)
+        sensor = SampleType(sensor_type)
+        return cls(sensor, timestamp, acc, gyro)
+
+    @classmethod
+    def sample_size(cls) -> int:
+        """Return the number of bytes required to serialize one sample."""
+        return struct.calcsize(cls.STRUCT_FORMAT)
+    
+    @classmethod
+    def sample_type(cls) -> SampleType:
+        return cls.sensor

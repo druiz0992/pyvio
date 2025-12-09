@@ -1,6 +1,6 @@
 from typing import Dict
 
-from pyvio.core.domain.samples import SensorType
+from pyvio.core.ports.sample import SampleType
 
 
 class TimestampUnwrapper:
@@ -8,8 +8,8 @@ class TimestampUnwrapper:
 
     def __init__(self, clock_freq_hz: int):
         # store previous raw timestamp for each sensor
-        self.prev_raw: Dict[SensorType, int] = {}
-        self.offset: Dict[SensorType, int] = {}
+        self.prev_raw: Dict[SampleType, int] = {}
+        self.offset: Dict[SampleType, int] = {}
         
         self._clock_freq_hz = clock_freq_hz
         if clock_freq_hz == 0:
@@ -19,7 +19,7 @@ class TimestampUnwrapper:
             self._ticks_ns: int = 1_000_000_000 // self._clock_freq_hz
             self._ticks_rem: int = 1_000_000_000 % self._clock_freq_hz
 
-    def unwrap(self, sensor: SensorType, raw_ts: int) -> int:
+    def unwrap(self, sensor: SampleType, raw_ts: int) -> int:
         if sensor not in self.prev_raw:
             self.prev_raw[sensor] = raw_ts
             self.offset[sensor] = 0

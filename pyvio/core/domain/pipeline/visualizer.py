@@ -3,12 +3,12 @@ from collections import deque
 from matplotlib.animation import FuncAnimation
 from typing import List
 
-from pyvio.core.domain.samples import SensorType
+from pyvio.core.ports.sample import SampleType
 from .stage import Stage
 
 
 class LiveVisualizer:
-    def __init__(self, stage: Stage, sensors: List[SensorType], maxlen=1000):
+    def __init__(self, stage: Stage, sensors: List[SampleType], maxlen=1000):
         self.stage = stage
         self._sensors = sensors
         self.buffers = {s: deque(maxlen=maxlen) for s in sensors}

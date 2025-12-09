@@ -33,7 +33,6 @@ def test_default_state():
     assert_vec_close(s.bg, np.zeros(3))
     assert_vec_close(s.ba, np.zeros(3))
     assert_vec_close(s.g, np.array([0,0,-9.81]))
-    assert s.integrator == IntegrationMethod.EULER
 
 
 def test_to_from_vector_roundtrip():

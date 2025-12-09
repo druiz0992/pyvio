@@ -3,21 +3,24 @@ import threading
 import time
 
 from pyvio.core.domain.params.stream_params import StreamParams
-from pyvio.core.domain.samples import SensorSample, SensorType
+from pyvio.core.ports.sample import SampleType
 from pyvio.adapters.readers import FileReader, UDPSocketReader
 from pyvio.adapters.writers import FileWriter
 from pyvio.core.ports.writer import WriterPort
 from pyvio.core.ports.reader import ReaderPort
+from pyvio.core.ports.sample import SamplePort
 from pyvio.utils.stats_deque import TIMESTAMP_DIFF
 from .stage import Stage
 
 
 class Consumer:
     def __init__(
-        self, stream_params: StreamParams, maxlen: int = 100, window: int = 50
+        self, stream_params: StreamParams, sample_cls: type[SamplePort], maxlen: int = 100, window: int = 50
     ):
-        self.stage = Stage[SensorSample](
-            sensors=SensorType.list(),
+        
+        self.sample_cls = sample_cls
+        self.stage = Stage[sample_cls](
+            sensors=SampleType.sample_list(),
             maxlen=maxlen,
             window=window,
             stats=[TIMESTAMP_DIFF],
@@ -55,7 +58,7 @@ class Consumer:
         t.start()
 
     def _consume(self):
-        sample_size = SensorSample.sample_size()
+        sample_size = self.sample_cls.sample_size()
         try:
             while self._running_:
                 data = self._reader.read(sample_size)
@@ -66,8 +69,8 @@ class Consumer:
                     self._writer.write(data)
 
                 try:
-                    sample = SensorSample.from_bytes(data)
-                    self.stage.put(sample.sensor, sample)
+                    sample = self.sample_cls.from_bytes(data)
+                    self.stage.put(sample.sample_type(), sample)
                 except Exception as e:
                     print(f"Failed to parse sample: {e}")
                 time.sleep(self._delay)

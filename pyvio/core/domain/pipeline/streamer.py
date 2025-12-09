@@ -1,9 +1,9 @@
 from collections import deque
-from typing import List, Dict, Iterator, Optional
+from typing import List, Dict, Optional
 import threading
 
 from pyvio.core.domain.params.stream_params import StreamParams
-from pyvio.core.domain.samples import SensorSample, SensorType
+from pyvio.core.ports.sample import SampleType, SamplePort
 from pyvio.adapters.writers import FileWriter, UDPSocketWriter
 from pyvio.core.ports.writer import WriterPort
 from .stage import Stage
@@ -11,7 +11,7 @@ from .stage import Stage
 class Streamer:
     def __init__(self, stages: List[Stage], stream_params: StreamParams, maxlen: int = 100):
         self.stages = stages
-        self.buffers: Dict[SensorType, deque] = {}
+        self.buffers: Dict[SampleType, deque] = {}
         self._running_ = True
         
         if stream_params.enable is False:
@@ -32,7 +32,11 @@ class Streamer:
                 if sensor not in self.buffers:
                     self.buffers[sensor] = deque(maxlen=maxlen)
                     # Subscribe to update buffer whenever a new sample arrives
-                    stage.subscribe(sensor, lambda sample, s=sensor: self.buffers[s].append(sample))
+                    #stage.subscribe(sensor, lambda sample, s=sensor: self.buffers[s].append(sample))
+                    stage.subscribe(sensor, lambda sample, s=sensor: self.append(s, sample))
+                    
+    def append(self, s, sample):
+        self.buffers[s].append(sample)
                     
     def stop(self):
         self._running_ = False
@@ -45,7 +49,7 @@ class Streamer:
         while self._running_:
             for buf in self.buffers.values():
                 if buf:
-                    sample: SensorSample = buf.popleft()
+                    sample: SamplePort = buf.popleft()
                     data = sample.to_bytes()
                     for w in self._writers:
                         w.write(data)

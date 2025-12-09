@@ -3,10 +3,9 @@ import requests
 import time
 from typing import List, Callable, Tuple
 
-from pyvio.core.ports.sensor import SensorPort
-from pyvio.core.domain.samples import (
+from pyvio.core.ports.sensor import SensorPort, SampleType
+from pyvio.core.domain.sample import (
     RawSensorSample,
-    SensorType,
     SensorSample,
 )
 from pyvio.core.config import Config
@@ -57,15 +56,15 @@ class PhyphoxSensorAdapter(SensorPort):
         """Append sample to the corresponding sensor queue."""
         self.stage.put(sample.sensor, SensorSample.from_raw(sample))
 
-    def get(self, sensor: SensorType) -> SensorSample | None:
+    def get(self, sensor: SampleType) -> SensorSample | None:
         """Get oldest sample from specific sensor queue."""
         return self.stage.get(sensor)
 
-    def get_buffer(self, sensor: SensorType) -> List[SensorSample]:
+    def get_buffer(self, sensor: SampleType) -> List[SensorSample]:
         """Return a snapshot of the internal queue."""
         return self.stage.get_buffer(sensor)
 
-    def subscribe(self, sensor: SensorType, callback: Callable[[SensorSample], None]):
+    def subscribe(self, sensor: SampleType, callback: Callable[[SensorSample], None]):
         """Observers will be called with each processed SensorSample."""
         self.stage.subscribe(sensor, callback)
 
@@ -131,8 +130,8 @@ class PhyphoxSensorAdapter(SensorPort):
         heading = dirs[n] or 0.0
         v = vs[n] or 0.0
     
-        latlon_sample = SensorSample(SensorType.GPS, timestamp, lat, lon, alt)
-        velocity_sample = SensorSample(SensorType.ODOMETRY, timestamp, v, heading, 0)
+        latlon_sample = SensorSample(SampleType.GPS, timestamp, lat, lon, alt)
+        velocity_sample = SensorSample(SampleType.ODOMETRY, timestamp, v, heading, 0)
         
         return (latlon_sample, velocity_sample)
     
@@ -145,9 +144,9 @@ class PhyphoxSensorAdapter(SensorPort):
                 samples = self._decode_data(data)
                 if samples is not None:
                     n_no_data = 0
-                    if SensorType.GPS in self._sensors:
+                    if SampleType.GPS in self._sensors:
                         self.stage.put(samples[0].sensor, samples[0])
-                    if SensorType.ODOMETRY in self._sensors:
+                    if SampleType.ODOMETRY in self._sensors:
                         self.stage.put(samples[1].sensor, samples[1])
                 else:
                     n_no_data += 1

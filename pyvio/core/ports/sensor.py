@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Optional, List, Callable
-from ..domain.samples import RawSensorSample, SensorSample, SensorType
+from ..domain.sample import RawSensorSample, SensorSample
+from pyvio.core.ports.sample import SampleType
 
 
 class SensorPort(ABC):
     @abstractmethod
-    def get(self, sensor: Optional[SensorType] = None) -> SensorSample | None:
+    def get(self, sensor: Optional[SampleType] = None) -> SensorSample | None:
         """
         Get a sample from the sensor port.
 
@@ -33,11 +34,11 @@ class SensorPort(ABC):
         pass
 
     @abstractmethod
-    def subscribe(self, sensor: SensorType, callback: Callable[[SensorSample], None]):
+    def subscribe(self, sensor: SampleType, callback: Callable[[SensorSample], None]):
         """Observers will be called with each processed SensorSample."""
         pass
 
     @abstractmethod
-    def get_buffer(self, sensor: SensorType) -> List[SensorSample]:
+    def get_buffer(self, sensor: SampleType) -> List[SensorSample]:
         """Return a snapshot of the buffer for this sensor."""
         pass
