@@ -66,9 +66,7 @@ class SimpleEstimator:
                 last_timestamp = sample.timestamp
                 continue
             
-            print(f"Old state: {state.p} {state.v} {dt}")
             state = self._integrator.integrate(state, sample.gyro, sample.acc, dt)
-            print(f"New state: {state.p} {state.v}") 
             
             self.output_stage.put(SampleType.STATE, state)
 

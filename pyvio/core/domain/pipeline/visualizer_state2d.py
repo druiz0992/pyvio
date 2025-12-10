@@ -44,7 +44,6 @@ class LiveVisualizerState2D:
         xs = [s.p[0] for s in window]
         ys = [s.p[1] for s in window]
         self.pos_line.set_data(xs, ys)
-        print(f"pos: {xs} {ys}")
 
         # heading as small vector
         headings = [
