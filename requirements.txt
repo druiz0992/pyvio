@@ -8,3 +8,4 @@ gpiod==2.4.0
 requests==2.32.5
 pyproj==3.7.2
 pytest==9.0.1
+scipy==1.16.3

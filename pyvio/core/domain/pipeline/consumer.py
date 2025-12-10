@@ -15,9 +15,13 @@ from .stage import Stage
 
 class Consumer:
     def __init__(
-        self, stream_params: StreamParams, sample_cls: type[SamplePort], maxlen: int = 100, window: int = 50
+        self,
+        stream_params: StreamParams,
+        sample_cls: type[SamplePort],
+        maxlen: int = 100,
+        window: int = 50,
     ):
-        
+
         self.sample_cls = sample_cls
         self.stage = Stage[sample_cls](
             sensors=SampleType.sample_list(),
