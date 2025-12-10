@@ -45,14 +45,21 @@ class SimpleEstimator:
                 continue
             
             sample = self.buffer.popleft()
-            
+           
             if last_timestamp is None:
                 # skip integration for the first sample
                 last_timestamp = sample.timestamp
                 continue
-            
+           
             dt = (sample.timestamp - last_timestamp) * 1e-9
+            
+            if dt > 1.0:
+                last_timestamp = sample.timestamp
+                continue
+            
+            print(f"Old state: {state.p} {state.v} {dt}")
             state = self._integrator.integrate(state, sample.gyro, sample.acc, dt)
+            print(f"New state: {state.p} {state.v}") 
             
             self.output_stage.put(SampleType.STATE, state)
             
