@@ -18,7 +18,7 @@ def main():
 
     # ahrs.start_animation(interval=50)
 
-    visualizer.start_animation(interval=50)
+    visualizer.start(interval=50)
 
 
 if __name__ == "__main__":
