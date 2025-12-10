@@ -40,9 +40,9 @@ def main():
     # visualizer = LiveVisualizer(phyphox.stage, SampleType.gps_list())
     # ahrs = Ahrs(imu.stage, maxlen=100)
 
-    # ahrs.start_animation(interval=50)
+    # ahrs.start(interval=50)
 
-    # visualizer.start_animation(interval=50)
+    # visualizer.start(interval=50)
     while True:
         time.sleep(0.1)
 

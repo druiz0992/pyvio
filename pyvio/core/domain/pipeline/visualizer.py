@@ -54,7 +54,7 @@ class LiveVisualizer:
 
         return [l for lines in self.lines.values() for l in lines]
 
-    def start_animation(self, interval=50):
+    def start(self, interval=50):
         self.ani = FuncAnimation(
             self.fig, self.update_plot, frames=500, interval=interval, blit=False
         )

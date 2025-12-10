@@ -17,7 +17,7 @@ def main():
     visualizer = LiveVisualizerState3D(consumer.stage)
     # ahrs = Ahrs(consumer.stage, maxlen=100)
 
-    # ahrs.start_animation(interval=50)
+    # ahrs.start(interval=50)
 
     visualizer.start(interval=50)
 
