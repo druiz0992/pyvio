@@ -24,28 +24,25 @@ logging.basicConfig(
 def main():
     cfg = Config("./configs/config.yaml")
     imu: SensorPort = SerialSensorAdapter(cfg)
-    
+
     interpolator = Interpolator(imu.stage, SampleType.interp_list(), LinearInterpolator)
     estimator = SimpleEstimator(interpolator.output_stage, EulerIntegrator)
-    #phyphox: SensorPort = PhyphoxSensorAdapter(cfg)
+    # phyphox: SensorPort = PhyphoxSensorAdapter(cfg)
 
     streamer = Streamer([estimator.output_stage], cfg.stream_params())
-    
+
     imu.start()
     interpolator.start()
     estimator.start()
     streamer.start()
-    #phyphox.start()
-    
-    
-    
-    
-    #visualizer = LiveVisualizer(phyphox.stage, SampleType.gps_list())
-    #ahrs = Ahrs(imu.stage, maxlen=100)
+    # phyphox.start()
 
-    #ahrs.start_animation(interval=50)
+    # visualizer = LiveVisualizer(phyphox.stage, SampleType.gps_list())
+    # ahrs = Ahrs(imu.stage, maxlen=100)
 
-    #visualizer.start_animation(interval=50)
+    # ahrs.start_animation(interval=50)
+
+    # visualizer.start_animation(interval=50)
     while True:
         time.sleep(0.1)
 
