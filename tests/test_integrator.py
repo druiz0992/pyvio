@@ -3,7 +3,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 from pyvio.core.domain.state import State
-from pyvio.core.domain.integrator import (
+from pyvio.core.services.integrator import (
     EulerIntegrator,
     MidpointIntegrator,
     RK4Integrator,

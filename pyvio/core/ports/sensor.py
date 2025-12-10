@@ -42,3 +42,16 @@ class SensorPort(ABC):
     def get_buffer(self, sensor: SampleType) -> List[SensorSample]:
         """Return a snapshot of the buffer for this sensor."""
         pass
+
+
+
+
+class MockSensorPort(SensorPort):
+    """
+    A generic mock sensor port that generates SensorSample instances
+    from a given trajectory and allows subscribing/getting samples.
+    """
+    @abstractmethod
+    def _generate_samples(self, t: float):
+        """Generate samples for all sensors at time t and call self.put() for each."""
+        pass

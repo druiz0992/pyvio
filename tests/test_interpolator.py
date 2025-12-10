@@ -1,18 +1,10 @@
 import unittest
-import numpy as np
 from scipy.spatial.transform import Rotation as R
 from collections import deque
 
 from pyvio.core.domain.sample import SensorSample
-from pyvio.core.domain.state import State
-from pyvio.core.domain.interpolator import (
-    LinearInterpolator,
-    MidpointInterpolator,
-    find_bracket,
-)
 from pyvio.core.ports.sample import SampleType
-from pyvio.core.ports.interpolator import IMUInterpolator
-from pyvio.core.domain.interpolator import (
+from pyvio.core.services.interpolator import (
     LinearInterpolator,
     MidpointInterpolator,
     find_bracket,

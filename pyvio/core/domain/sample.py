@@ -110,7 +110,7 @@ class SensorSample(SamplePort):
 
     @classmethod
     def from_bytes(cls, data: bytes) -> Self:
-        """
+        """pyvio/core/domain/params
         Deserialize from bytes back to SensorSample.
         """
         sensor_val, timestamp, x, y, z = struct.unpack(cls.STRUCT_FORMAT, data)
